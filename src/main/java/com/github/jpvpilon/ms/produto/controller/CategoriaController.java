@@ -2,13 +2,14 @@ package com.github.jpvpilon.ms.produto.controller;
 
 import com.github.jpvpilon.ms.produto.dto.CategoriaDTO;
 import com.github.jpvpilon.ms.produto.service.CategoriaService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -23,5 +24,43 @@ public class CategoriaController {
         List<CategoriaDTO> categorias = categoriaService.findAllCategorias();
 
         return ResponseEntity.ok(categorias);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CategoriaDTO> getCategoriaById(@PathVariable Long id) {
+
+        CategoriaDTO categoriaDto = categoriaService.findCategoriaById(id);
+        return ResponseEntity.ok(categoriaDto);
+
+    }
+
+    @PostMapping
+    public ResponseEntity<CategoriaDTO> createCategoria(@RequestBody @Valid CategoriaDTO categoriaDto) {
+
+        categoriaDto = categoriaService.saveCategoria(categoriaDto);
+
+        URI uri = ServletUriComponentsBuilder
+                .fromCurrentRequestUri()
+                .path("/{id}")
+                .buildAndExpand(categoriaDto.getId())
+                .toUri();
+
+        return ResponseEntity.created(uri).body(categoriaDto);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CategoriaDTO> updateCategoria(@PathVariable Long id,
+                                                        @Valid @RequestBody CategoriaDTO categoriaDto) {
+
+        categoriaDto = categoriaService.updateCategoria(id, categoriaDto);
+        return ResponseEntity.ok(categoriaDto);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Valid> deleteCategoria(@PathVariable Long id) {
+
+        categoriaService.deleteCategoriaById(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

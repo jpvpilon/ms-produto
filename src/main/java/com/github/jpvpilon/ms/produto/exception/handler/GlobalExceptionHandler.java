@@ -61,21 +61,32 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(err);
     }
 
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<CustomErrorDTO> handleTypeMismatch(
-            MethodArgumentNotValidException e,
-            HttpServletRequest request) {
 
-        HttpStatus status = HttpStatus.BAD_REQUEST; // 400
-        CustomErrorDTO err = new CustomErrorDTO(
-                Instant.now(),
-                status.value(),
-                "Requisição inválida (parâmetro com tipo/formato incorreto).",
-                request.getRequestURI()
-        );
+    @ExceptionHandler(DatabaseException.class)
+    public ResponseEntity<CustomErrorDTO> handleDatabase(DatabaseException e,
+                                                         HttpServletRequest request) {
+
+        HttpStatus status = HttpStatus.CONFLICT;
+        CustomErrorDTO err = new CustomErrorDTO(Instant.now(), status.value(),
+                e.getMessage(), request.getRequestURI());
 
         return ResponseEntity.status(status).body(err);
     }
+//    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+//    public ResponseEntity<CustomErrorDTO> handleTypeMismatch(
+//            MethodArgumentNotValidException e,
+//            HttpServletRequest request) {
+//
+//        HttpStatus status = HttpStatus.BAD_REQUEST; // 400
+//        CustomErrorDTO err = new CustomErrorDTO(
+//                Instant.now(),
+//                status.value(),
+//                "Requisição inválida (parâmetro com tipo/formato incorreto).",
+//                request.getRequestURI()
+//        );
+//
+//        return ResponseEntity.status(status).body(err);
+//    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<CustomErrorDTO> handleGenericException(
